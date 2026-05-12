@@ -70,6 +70,10 @@ const initDB = async () => {
     // Check if questions exist
     const result = await pool.query('SELECT COUNT(*) FROM questions');
     console.log(`📊 Questions in DB: ${result.rows[0].count}`);
+    // Show which database we are connected to
+    const dbInfo = await pool.query('SELECT current_database(), inet_server_addr()');
+    console.log(`🔌 Connected to database: ${JSON.stringify(dbInfo.rows[0])}`);
+    console.log(`🔑 DATABASE_URL starts with: ${(process.env.DATABASE_URL || 'NOT SET').substring(0, 50)}`);
   } catch (err) {
     console.error('❌ DB init error:', err.message);
   }
