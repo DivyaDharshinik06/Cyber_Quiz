@@ -11,18 +11,19 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 
 // Allow both local dev and deployed Vercel frontend
-const allowedOrigins = [
-  'http://localhost:3000',
-  process.env.FRONTEND_URL, // set this in Render environment variables
-];
-
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (mobile apps, curl)
+    if (!origin) return callback(null, true);
+    // Allow localhost and any vercel.app domain
+    if (
+      origin.includes('localhost') ||
+      origin.includes('vercel.app') ||
+      origin === process.env.FRONTEND_URL
+    ) {
+      return callback(null, true);
     }
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
