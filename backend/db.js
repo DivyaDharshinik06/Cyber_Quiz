@@ -1,23 +1,25 @@
-// db.js - PostgreSQL connection pool
+// db.js - PostgreSQL connection (supports Render DATABASE_URL)
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-});
+const pool = new Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }, // required by Render
+      }
+    : {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+      }
+);
 
-// Test connection on startup
 pool.connect((err, client, release) => {
-  if (err) {
-    console.error('❌ Database connection error:', err.message);
-  } else {
-    console.log('✅ Connected to PostgreSQL database');
-    release();
-  }
+  if (err) console.error('❌ Database connection error:', err.message);
+  else { console.log('✅ Connected to PostgreSQL'); release(); }
 });
 
 module.exports = pool;
