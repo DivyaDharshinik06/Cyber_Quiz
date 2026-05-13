@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const quizRoutes = require('./routes/quiz');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
+const seedQuestions = require('./seed');
 
 const app = express();
 
@@ -66,6 +67,7 @@ const initDB = async () => {
       );
     `);
     console.log('✅ Tables ready');
+    await seedQuestions(pool);
 
     // Check if questions exist
     const result = await pool.query('SELECT COUNT(*) FROM questions');
